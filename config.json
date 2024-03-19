@@ -5,14 +5,9 @@
     "author": "Assaf Stone, @devopsjester",
     "license": "MIT",
     "settings": {
-        "orgsToSync": [
-            {
-                "features": { "syncRepos": true, "syncPullRequests": false },
-                "source": "org-sync-source",
-                "shadows": ["org-sync-target"],
-                "whitelist": ["*"],
-                "exceptions": ["org-sync"]
-            }
-        ]
+        "features": { "syncRepos": true, "syncPullRequests": false },
+        "shadows": ["org-sync-target"],
+        "whitelist": [".*"],
+        "exceptions": ["^org-sync$"]
     }
 }

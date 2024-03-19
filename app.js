@@ -33,15 +33,15 @@ const messageForNewPRs = "Thanks for opening a new PR! Please follow our contrib
 async function handlePullRequestOpened({octokit, payload}) {
   try {
     // handle the event if the pull request is for a repository whose name matches the whitelist pattern in the config file but not the blacklist pattern
-    if (config.whitelist && !config.whitelist.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
-      console.log(`The pull request is for a repository that does not match the whitelist pattern`);
+    if (config.settings.whitelist && !config.settings.whitelist.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
+      console.log(`PR ignored because it's for a repository that does not match the whitelist pattern`);
       return;
     }
-    if (config.blacklist && config.blacklist.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
-      console.log(`The pull request is for a repository that matches the blacklist pattern`);
+    if (config.settings.exceptions && config.settings.exceptions.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
+      console.log(`PR ignored because it's for a repository that matches the blacklist pattern`);
       return;
     }
-    
+
     console.log(`Received a pull request event for #${payload.pull_request.number}`);
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
