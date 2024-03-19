@@ -31,9 +31,18 @@ const messageForNewPRs = "Thanks for opening a new PR! Please follow our contrib
 
 // This adds an event handler that your code will call later. When this event handler is called, it will log the event to the console. Then, it will use GitHub's REST API to add a comment to the pull request that triggered the event.
 async function handlePullRequestOpened({octokit, payload}) {
-  console.log(`Received a pull request event for #${payload.pull_request.number}`);
-
   try {
+    // handle the event if the pull request is for a repository whose name matches the whitelist pattern in the config file but not the blacklist pattern
+    if (config.whitelist && !config.whitelist.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
+      console.log(`The pull request is for a repository that does not match the whitelist pattern`);
+      return;
+    }
+    if (config.blacklist && config.blacklist.some((pattern) => new RegExp(pattern).test(payload.repository.name))) {
+      console.log(`The pull request is for a repository that matches the blacklist pattern`);
+      return;
+    }
+    
+    console.log(`Received a pull request event for #${payload.pull_request.number}`);
     await octokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
       owner: payload.repository.owner.login,
       repo: payload.repository.name,
