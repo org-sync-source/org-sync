@@ -24,6 +24,8 @@ const app = new App({
   },
 });
 
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
+
 // This defines the message that your app will post to pull requests.
 const messageForNewPRs = "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
 
