@@ -12,7 +12,8 @@ export async function handlePullRequestOpened({ octokit, payload }, config) {
         }
 
         console.log(`Received a pull request event for #${payload.pull_request.number}`);
-        await postComment(octokit, payload);
+        // await postComment(octokit, payload);
+        await openPullRequestInShadowRepos(octokit, payload, config);
     } catch (error) {
         if (error.response) {
             console.error(`Error! Status: ${error.response.status}. Message: ${error.response.data.message}`)
@@ -34,4 +35,27 @@ async function postComment(octokit, payload) {
             "x-github-api-version": "2022-11-28",
         },
     });
+}
+
+async function openPullRequestInShadowRepos(octokit, payload, config) {
+    for (const targetOrg of config.settings.shadows) {
+        const shadowRepo = `${targetOrg}/${payload.repository.name}`;
+        try {
+            await octokit.request("POST /repos/{owner}/{repo}/pulls", {
+                owner: targetOrg,
+                repo: payload.repository.name,
+                title: payload.pull_request.title,
+                head: payload.pull_request.head.ref,
+                base: payload.pull_request.base.ref,
+                body: `This pull request was opened in ${payload.repository.full_name} and has been mirrored here for review.`,
+                headers: {
+                    "x-github-api-version": "2022-11-28",
+                },
+            });
+            console.log(`Opened a pull request in ${shadowRepo}`);
+        } catch (error) {
+            console.error(`Error opening a pull request in ${shadowRepo}`);
+            console.error(error);
+        }
+    }
 }

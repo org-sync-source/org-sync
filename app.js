@@ -9,6 +9,7 @@ import http from "http";
 import { handlePullRequestOpened } from "./handlers/pull-requests.js";
 
 
+
 // This reads your `.env` file and adds the variables from that file to the `process.env` object in Node.js.
 dotenv.config();
 
@@ -28,8 +29,13 @@ const app = new App({
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-// This sets up a webhook event listener. When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `pull_request` and an `action` payload value of `opened`, it calls the `handlePullRequestOpened` event handler that is defined above.
-app.webhooks.on("pull_request.opened", (webhook) => handlePullRequestOpened(webhook, config));
+// This sets up a webhook event listener. 
+
+// Check if the "syncPullRequests" feature is enabled in the config file's settings
+//When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `pull_request` and an `action` payload value of `opened`, it calls the `handlePullRequestOpened` event handler that is defined above.
+if (config.settings && config.settings.features.syncPullRequests) {
+  app.webhooks.on("pull_request.opened", (webhook) => handlePullRequestOpened(webhook, config));
+}
 
 // This logs any errors that occur.
 app.webhooks.onError((error) => {
