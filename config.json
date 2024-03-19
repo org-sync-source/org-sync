@@ -1,0 +1,22 @@
+{
+    "name": "org-sync-app",
+    "version": "0.1.0",
+    "description": "Syncs GitHub orgs and their repos",
+    "author": "Assaf Stone, @devopsjester",
+    "license": "MIT",
+    "settings": {
+        "features": {
+            "syncRepos": true,
+            "syncPullRequests": true
+        },
+        "shadows": [
+            "org-sync-target"
+        ],
+        "whitelist": [
+            ".*"
+        ],
+        "exceptions": [
+            "^org-sync$"
+        ]
+    }
+}
