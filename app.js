@@ -13,10 +13,7 @@ dotenv.config();
 // This assigns the values of your environment variables to local variables.
 const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
-const privateKeyPath = process.env.PRIVATE_KEY_PATH;
-
-// This reads the contents of your private key file.
-const privateKey = fs.readFileSync(privateKeyPath, "utf8");
+const privateKey = process.env.SYNC_PRIVATE_KEY;
 
 // This creates a new instance of the Octokit App class.
 const app = new App({
