@@ -6,7 +6,7 @@
     "license": "MIT",
     "settings": {
         "features": {
-            "syncRepos": true,
+            "syncPushes": true,
             "syncPullRequests": true
         },
         "shadows": [

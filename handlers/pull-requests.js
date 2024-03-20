@@ -1,4 +1,5 @@
-// This adds an event handler that your code will call later. When this event handler is called, it will log the event to the console. Then, it will use GitHub's REST API to add a comment to the pull request that triggered the event.
+// This adds an event handler that your code will call later. When this event handler is called, it will log the event to the console. 
+// Then, it will use GitHub's REST API to add a POST the pull request that triggered the event in the shadow repo
 export async function handlePullRequestOpened({ octokit, payload }, config) {
     try {
         // handle the event if the pull request is for a repository whose name matches the whitelist pattern in the config file but not the blacklist pattern

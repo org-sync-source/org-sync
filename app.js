@@ -2,13 +2,13 @@
 //
 // You installed the `dotenv` and `octokit` modules earlier. The `@octokit/webhooks` is a dependency of the `octokit` module, so you don't need to install it separately. The `fs` and `http` dependencies are built-in Node.js modules.
 import dotenv from "dotenv";
-import { App } from "octokit";
+import { App, Octokit } from "octokit";
 import { createNodeMiddleware } from "@octokit/webhooks";
+import { createAppAuth } from "@octokit/auth-app";
 import fs from "fs";
 import http from "http";
 import { handlePullRequestOpened } from "./handlers/pull-requests.js";
-
-
+import { handlePush } from "./handlers/pushes.js";
 
 // This reads your `.env` file and adds the variables from that file to the `process.env` object in Node.js.
 dotenv.config();
@@ -17,13 +17,23 @@ dotenv.config();
 const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKey = process.env.SYNC_PRIVATE_KEY;
+const installationId = process.env.INSTALLATION_ID;
 
 // This creates a new instance of the Octokit App class.
 const app = new App({
   appId: appId,
   privateKey: privateKey,
   webhooks: {
-    secret: webhookSecret
+    secret: webhookSecret,
+  },
+});
+
+const installationOctokit = new Octokit({
+  authStrategy: createAppAuth,
+  auth: {
+    appId: appId,
+    privateKey: privateKey,
+    installationId: installationId,
   },
 });
 
@@ -32,9 +42,15 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 // This sets up a webhook event listener. 
 
 // Check if the "syncPullRequests" feature is enabled in the config file's settings
-//When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `pull_request` and an `action` payload value of `opened`, it calls the `handlePullRequestOpened` event handler that is defined above.
+//When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `pull_request` and an `action` payload value of `opened`, it calls the `handlePullRequestOpened` event handler that is defined in /handlers/pull-requests.js.
 if (config.settings && config.settings.features.syncPullRequests) {
   app.webhooks.on("pull_request.opened", (webhook) => handlePullRequestOpened(webhook, config));
+}
+
+// Check if the "syncPushes" feature is enabled in the config file's settings
+//When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `push`, it calls the `handlePush` event handler that is defined in /handlers/pushes.js.
+if (config.settings && config.settings.features.syncPushes) {
+  app.webhooks.on("push", (webhook) => handlePush(webhook, config, installationOctokit));
 }
 
 // This logs any errors that occur.
