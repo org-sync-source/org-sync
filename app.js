@@ -4,7 +4,6 @@
 import dotenv from "dotenv";
 import { App, Octokit } from "octokit";
 import { createNodeMiddleware } from "@octokit/webhooks";
-import { createAppAuth } from "@octokit/auth-app";
 import fs from "fs";
 import http from "http";
 import { handlePullRequestOpened } from "./handlers/pull-requests.js";
@@ -17,7 +16,7 @@ dotenv.config();
 const appId = process.env.APP_ID;
 const webhookSecret = process.env.WEBHOOK_SECRET;
 const privateKey = process.env.SYNC_PRIVATE_KEY;
-const installationId = process.env.INSTALLATION_ID;
+const token = process.env.PERSONAL_ACCESS_TOKEN;
 
 // This creates a new instance of the Octokit App class.
 const app = new App({
@@ -25,15 +24,6 @@ const app = new App({
   privateKey: privateKey,
   webhooks: {
     secret: webhookSecret,
-  },
-});
-
-const installationOctokit = new Octokit({
-  authStrategy: createAppAuth,
-  auth: {
-    appId: appId,
-    privateKey: privateKey,
-    installationId: installationId,
   },
 });
 
@@ -50,7 +40,7 @@ if (config.settings && config.settings.features.syncPullRequests) {
 // Check if the "syncPushes" feature is enabled in the config file's settings
 //When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `push`, it calls the `handlePush` event handler that is defined in /handlers/pushes.js.
 if (config.settings && config.settings.features.syncPushes) {
-  app.webhooks.on("push", (webhook) => handlePush(webhook, config, installationOctokit));
+  app.webhooks.on("push", (webhook) => handlePush(webhook, config, token));
 }
 
 // This logs any errors that occur.
