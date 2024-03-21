@@ -6,13 +6,16 @@
   "type": "module",
   "scripts": {
     "server": "node app.js"
-  },  
+  },
   "keywords": [],
   "author": "Assaf Stone, devopsjester@github.com",
   "license": "MIT",
   "dependencies": {
+    "@octokit/auth-app": "^6.0.4",
+    "@octokit/core": "^5.1.0",
     "dotenv": "^16.4.5",
-    "octokit": "^3.1.2"
+    "octokit": "^3.1.2",
+    "simple-git": "^3.23.0"
   },
   "devDependencies": {
     "smee-client": "^2.0.1"
