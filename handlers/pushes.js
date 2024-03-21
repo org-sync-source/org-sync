@@ -77,7 +77,7 @@ async function initializeGitRepo(directory, owner, repo, token) {
     }
 }
 
-// fetch the commits from the source repository
+// Fetch and pull everything from the source repository
 async function fetchAndPullSourceRepo(git) {
     try {
         // Prune before fetching
@@ -94,7 +94,8 @@ async function fetchAndPullSourceRepo(git) {
                 const branchName = branch.replace('origin/', ''); // Remove 'origin/' prefix
                 try {
                     await git.checkout(branchName);
-                    await git.pull('origin', branchName);
+                    await git.pull('origin', branchName, { '--rebase': 'true' }); // Use rebase during pull
+                    console.log(`Pulled ${branchName} from origin`);
                 } catch (error) {
                     console.error(`Error pulling ${branchName} from origin`);
                     console.error(error);

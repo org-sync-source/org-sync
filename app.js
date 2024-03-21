@@ -27,6 +27,8 @@ const app = new App({
   },
 });
 
+const octokit = new Octokit({ auth: token });
+
 const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
 // This sets up a webhook event listener. 
@@ -34,7 +36,7 @@ const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 // Check if the "syncPullRequests" feature is enabled in the config file's settings
 //When your app receives a webhook event from GitHub with a `X-GitHub-Event` header value of `pull_request` and an `action` payload value of `opened`, it calls the `handlePullRequestOpened` event handler that is defined in /handlers/pull-requests.js.
 if (config.settings && config.settings.features.syncPullRequests) {
-  app.webhooks.on("pull_request.opened", (webhook) => handlePullRequestOpened(webhook, config));
+  app.webhooks.on("pull_request.opened", (webhook) => handlePullRequestOpened(webhook, config, octokit));
 }
 
 // Check if the "syncPushes" feature is enabled in the config file's settings
